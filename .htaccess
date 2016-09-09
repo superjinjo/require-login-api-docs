@@ -1,0 +1,24 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    RewriteRule ^index\.php$ - [L]
+
+    # add a trailing slash to /wp-admin
+    RewriteRule ^wp-admin$ wp-admin/ [R=301,L]
+
+    # POST to wp-login.php must have the site as the referer
+    RewriteCond %{REQUEST_METHOD} POST
+    RewriteCond %{REQUEST_URI} .(wp-comments-post|wp-login)\.php*
+    RewriteCond expr "! %{HTTP_REFERER} -strmatch '*://*%{HTTP_HOST}/*'" [OR]
+    RewriteCond %{HTTP_USER_AGENT} ^$
+    RewriteRule (.*) - [F,L]
+
+    # Authentication for viewing API docs
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^docs.*\.html$ docsauth.php [L]
+
+    # misc wordpress
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . /index.php [L]
+</IfModule>
